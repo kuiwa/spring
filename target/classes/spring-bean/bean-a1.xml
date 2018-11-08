@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:p="http://www.springframework.org/schema/p"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+<!--     <bean id="beanTemplate" abstract="true"> -->
+<!--         <property name="message" value="Hello World Parent!" /> -->
+<!--     </bean> -->
+
+<!-- xmlns:p="http://www.springframework.org/schema/p" while adding this line, can use p:name to replace property.... -->
+    <bean id="beanTemplate" abstract="true" p:message="Hello World Parent!" />
+
+    <bean id="helloWorldChild" class="com.mymaven.spring.ConfigurationData" parent="beanTemplate" />
+
+</beans>
