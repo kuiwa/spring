@@ -34,12 +34,6 @@ public class LambdaTestA {
         list.forEach(System.out::println);
     }
 
-    @Test
-    public void streamTestA() {
-        List<Integer> list = Arrays.asList(1, 2, 3, 4, 5, 6, 7);
-        list.stream().filter(i -> i < 5).forEach(System.out::println);
-    }
-
     private <R> R applyFunctionAndPrint(R object, Function<R, R> fun) {
         System.out.println("Before: " + object);
         R res = fun.apply(object);
