@@ -8,15 +8,15 @@ public class ConfigurationData {
         this.message = message;
     }
 
-//    @ReturnValue(default = "Hello world.")
+    //    @ReturnValue(default = "Hello world.")
     public void getMessage() {
         System.out.println("Your Message : " + message);
     }
-    
+
     public void init() {
         System.out.println("Bean is going through init.");
     }
-    
+
     public void destroy() {
         System.out.println("Bean will destroy now.");
     }

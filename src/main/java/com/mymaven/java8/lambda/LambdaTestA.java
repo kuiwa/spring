@@ -9,7 +9,7 @@ import org.testng.annotations.Test;
 
 public class LambdaTestA {
 
-    //    @Test
+    @Test
     public void mapTest() {
         List<Double> cost = Arrays.asList(10.0, 20.0, 30.0);
         cost.stream().map(x -> x + x * 0.05).forEach(x -> System.out.println(x));

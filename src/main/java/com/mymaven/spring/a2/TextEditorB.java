@@ -8,7 +8,7 @@ public class TextEditorB {
         System.out.println("Inside setSpellChecker");
         this.spellChecker = spellChecker;
     }
-    
+
     public SpellChecker getSpellChecker() {
         System.out.println("Inside getSpellChecker");
         return spellChecker;

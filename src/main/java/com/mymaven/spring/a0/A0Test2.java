@@ -3,7 +3,7 @@ package com.mymaven.spring.a0;
 import com.mymaven.spring.ConfigurationData;
 import com.mymaven.spring.TestAppTemplate;
 
-public class A0Test2 extends TestAppTemplate{
+public class A0Test2 extends TestAppTemplate {
 
     // scope="singleton"
     public void test() {
@@ -13,7 +13,7 @@ public class A0Test2 extends TestAppTemplate{
 
         config.setMessage("Hello Chengdu.");
         config.getMessage();
-        
+
         ConfigurationData configB = (ConfigurationData) context.getBean("singleton");
         configB.getMessage();
     }

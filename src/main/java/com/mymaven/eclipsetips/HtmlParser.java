@@ -1,6 +1,5 @@
 package com.mymaven.eclipsetips;
 
-
 public class HtmlParser implements Parser {
 
     public HtmlParser(int htmlInt) {

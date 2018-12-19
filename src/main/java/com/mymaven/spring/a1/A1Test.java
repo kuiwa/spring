@@ -3,8 +3,7 @@ package com.mymaven.spring.a1;
 import com.mymaven.spring.ConfigurationData;
 import com.mymaven.spring.TestAppTemplate;
 
-
-public class A1Test extends TestAppTemplate{
+public class A1Test extends TestAppTemplate {
 
     @Override
     public void test() {

@@ -1,6 +1,5 @@
 package com.mymaven.spring.a3;
 
-
 public class Foo {
 
     public Foo(int year, String name) {
