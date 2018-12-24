@@ -1,8 +1,153 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <suite name="Suite" parallel="false">
-  <test name="Test">
-    <classes>
-      <class name="com.hibernate.exceltojavabean"/>
-    </classes>
-  </test> <!-- Test -->
-</suite> <!-- Suite -->
+    <test name="BCCU01">
+        <classes>
+            <class name="com.hibernate.exceltojavabean.ExcelToBean" />
+            <parameter name="fileName" value="BCCU01" />
+        </classes>
+    </test>
+    <test name="BCCU02">
+        <classes>
+            <class name="com.hibernate.exceltojavabean.ExcelToBean" />
+            <parameter name="fileName" value="BCCU02" />
+        </classes>
+    </test>
+    <test name="BCCU03">
+        <classes>
+            <class name="com.hibernate.exceltojavabean.ExcelToBean" />
+            <parameter name="fileName" value="BCCU03" />
+        </classes>
+    </test>
+    <test name="BFU01">
+        <classes>
+            <class name="com.hibernate.exceltojavabean.ExcelToBean" />
+            <parameter name="fileName" value="BFU01" />
+        </classes>
+    </test>
+    <test name="BFU02">
+        <classes>
+            <class name="com.hibernate.exceltojavabean.ExcelToBean" />
+            <parameter name="fileName" value="BFU02" />
+        </classes>
+    </test>
+    <test name="BFU03">
+        <classes>
+            <class name="com.hibernate.exceltojavabean.ExcelToBean" />
+            <parameter name="fileName" value="BFU03" />
+        </classes>
+    </test>
+    <test name="BFU04">
+        <classes>
+            <class name="com.hibernate.exceltojavabean.ExcelToBean" />
+            <parameter name="fileName" value="BFU04" />
+        </classes>
+    </test>
+    <test name="BFU05">
+        <classes>
+            <class name="com.hibernate.exceltojavabean.ExcelToBean" />
+            <parameter name="fileName" value="BFU05" />
+        </classes>
+    </test>
+    <test name="BFU06">
+        <classes>
+            <class name="com.hibernate.exceltojavabean.ExcelToBean" />
+            <parameter name="fileName" value="BFU06" />
+        </classes>
+    </test>
+    <test name="BPAU01">
+        <classes>
+            <class name="com.hibernate.exceltojavabean.ExcelToBean" />
+            <parameter name="fileName" value="BPAU01" />
+        </classes>
+    </test>
+    <test name="BPAU02">
+        <classes>
+            <class name="com.hibernate.exceltojavabean.ExcelToBean" />
+            <parameter name="fileName" value="BPAU02" />
+        </classes>
+    </test>
+    <test name="BTDF01">
+        <classes>
+            <class name="com.hibernate.exceltojavabean.ExcelToBean" />
+            <parameter name="fileName" value="BTDF01" />
+        </classes>
+    </test>
+    <test name="BTDM01">
+        <classes>
+            <class name="com.hibernate.exceltojavabean.ExcelToBean" />
+            <parameter name="fileName" value="BTDM01" />
+        </classes>
+    </test>
+    <test name="FPMU01">
+        <classes>
+            <class name="com.hibernate.exceltojavabean.ExcelToBean" />
+            <parameter name="fileName" value="FPMU01" />
+        </classes>
+    </test>
+    <test name="LPMU01">
+        <classes>
+            <class name="com.hibernate.exceltojavabean.ExcelToBean" />
+            <parameter name="fileName" value="LPMU01" />
+        </classes>
+    </test>
+    <test name="LPMU02">
+        <classes>
+            <class name="com.hibernate.exceltojavabean.ExcelToBean" />
+            <parameter name="fileName" value="LPMU02" />
+        </classes>
+    </test>
+    <test name="LPMU03">
+        <classes>
+            <class name="com.hibernate.exceltojavabean.ExcelToBean" />
+            <parameter name="fileName" value="LPMU03" />
+        </classes>
+    </test>
+    <test name="LPMU04">
+        <classes>
+            <class name="com.hibernate.exceltojavabean.ExcelToBean" />
+            <parameter name="fileName" value="LPMU04" />
+        </classes>
+    </test>
+    <test name="TMU01">
+        <classes>
+            <class name="com.hibernate.exceltojavabean.ExcelToBean" />
+            <parameter name="fileName" value="TMU01" />
+        </classes>
+    </test>
+    <test name="TMU02">
+        <classes>
+            <class name="com.hibernate.exceltojavabean.ExcelToBean" />
+            <parameter name="fileName" value="TMU02" />
+        </classes>
+    </test>
+    <test name="RCU01">
+        <classes>
+            <class name="com.hibernate.exceltojavabean.ExcelToBean" />
+            <parameter name="fileName" value="RCU01" />
+        </classes>
+    </test>
+    <test name="RMU01">
+        <classes>
+            <class name="com.hibernate.exceltojavabean.ExcelToBean" />
+            <parameter name="fileName" value="RMU01" />
+        </classes>
+    </test>
+    <test name="ECU01">
+        <classes>
+            <class name="com.hibernate.exceltojavabean.ExcelToBean" />
+            <parameter name="fileName" value="ECU01" />
+        </classes>
+    </test>
+    <test name="ECU02">
+        <classes>
+            <class name="com.hibernate.exceltojavabean.ExcelToBean" />
+            <parameter name="fileName" value="ECU02" />
+        </classes>
+    </test>
+    <test name="ECU03">
+        <classes>
+            <class name="com.hibernate.exceltojavabean.ExcelToBean" />
+            <parameter name="fileName" value="ECU03" />
+        </classes>
+    </test>
+</suite>
