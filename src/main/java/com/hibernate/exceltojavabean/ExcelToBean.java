@@ -32,17 +32,17 @@ public class ExcelToBean
     private static final String UNSET = "Unset";
     private static ResourceBundle modelPropertiesBundle;
     private List<String> referenceIdStrings = new ArrayList<>();
-    private String boxNameString = UNSET;
     private BeanGenerator beanGeneratorSwitchBoxConfigurtion = new BeanGenerator();
     private BeanGenerator beanGeneratorSwitchChild = new BeanGenerator();
     private BeanGenerator beanGeneratorSwitch = new BeanGenerator();
     private BeanGenerator beanGeneratorSwitchPath = new BeanGenerator();
     private String[][] dataStrings;
-    private String xmlNameString = "";
-    private String beanId = "";
+    private String beanDirectory = "";
+    private String boxName = "";
     private String variant = "";
     private String productNumber = UNSET;
     private String revision = "";
+    private String beanId;
 
     static {
         //  
@@ -81,133 +81,107 @@ public class ExcelToBean
         return result;
     }
 
-    private List<Map<String, Object>> parseExcelCustom(Workbook workbook, String path, String sheetName)
+    private void parseExcelCustom(Workbook workbook, String path, String sheetName)
             throws IOException {
         List<String> switchParentName = new ArrayList<>();
-        List<Map<String, Object>> result = new LinkedList<Map<String, Object>>();
-        int excleRowLength = workbook.getSheetAt(0).getRow(0).getPhysicalNumberOfCells();
         System.out.println(workbook.getSheetName(1));
         String head = getCellValue(workbook.getSheetAt(0).getRow(0).getCell(0));
+        setXmlName(path, head);
         for (int sheetIndex = 0; sheetIndex < workbook.getNumberOfSheets(); sheetIndex++) { //sheet  
-            //            if (!workbook.getSheetName(sheetIndex).equals(sheetName))
-            //                continue;
             HSSFSheet sheet = (HSSFSheet) workbook.getSheetAt(sheetIndex);
             for (int rowIndex = 0; rowIndex < sheet.getPhysicalNumberOfRows(); rowIndex++) { //row  
                 if (rowIndex == 2)
                     continue;
                 HSSFRow row = sheet.getRow(rowIndex);
-                Map<String, Object> map = new HashMap<String, Object>();
                 List<String> switchPaths = new ArrayList<>();
                 for (int cellIndex = 0; cellIndex < row.getPhysicalNumberOfCells(); cellIndex++) { //cell  
                     HSSFCell cell = row.getCell(cellIndex);
                     String cellValue = getCellValue(cell);
-                    //                    if (!matchBoxName(cellValue))
-                    //                        continue;
-                    if (boxNameString.equals(UNSET)) {
-                        boxNameString = cellValue;
-                        setXmlName(cellValue);
-                        
-                    }
-                    if (rowIndex == 0) {
-                        setProductNumber(cellValue);
-                    }
-                    switchPaths.add(cellIndex, cellValue);
-                    if (rowIndex == 1) {
+                    setProductNumber(cellValue);
+                    if (rowIndex == 1)
                         switchParentName.add(cellIndex, getCellValue(cell));
-                        continue;
-                    }
+                    else if (rowIndex >= 3) // from third line to collect SPD path data
+                        switchPaths.add(cellIndex, cellValue);
                 }
-                if (rowIndex == 1) {
-                    formatSwitchPathParent(switchParentName);
-                    continue;
-                }
-                if (rowIndex >= 3) // from third line to collect SPD path data
-                    formatSwitchPathReference(switchPaths, switchParentName);
-                result.add(map);
+                formatBeanGeneratorSwitchPath(switchPaths, switchParentName);
+                formatBeanGeneratorSwitchBoxConfigurtionHead();
+                formatBeanGeneratorSwitchBoxConfigurtionRefs(switchPaths);
             }
         }
-        formatEnd();
-        String beanDirectory = path + beanId + ".xml";
+        formatBeanGeneratorSwitch(switchParentName);
+        formatBeanGeneratorSwitchBoxConfigurtionEnd();
         GenerateBean.generatNewBean("C:\\Users\\EKUIWAG\\Desktop\\bean-head.xml", beanDirectory);
         GenerateBean.writeBeans(beanDirectory, beanGeneratorSwitchBoxConfigurtion.getBeanString());
         GenerateBean.writeBeans(beanDirectory, beanGeneratorSwitchPath.getBeanString());
         GenerateBean.writeBeans(beanDirectory, beanGeneratorSwitchChild.getBeanString());
         GenerateBean.writeBeans(beanDirectory, beanGeneratorSwitch.getBeanString());
         GenerateBean.writeEndBeans(beanDirectory);
-        //        System.out.println(JSONObject.toJSONString("List<>=" + result));
-        return result;
     }
 
-    private void setXmlName(String cellValue) {
-        String boxNameString = cellValue.toString().trim().substring(1, cellValue.length() - 1).split("]")[0];        
-        if (cellValue.contains(":")){
-            beanId = boxNameString.replace(":", "-");
-        } else {
-            String[] name = boxNameString.split("\\.");
-            beanId = boxNameString.replace(".", "_");
-//            String string =beanId.substring(beanId.length()-1);
-            variant = name[1];
-            revision = name[name.length - 1];
-            
-        }
-//        beanId = beanId.split("]")[0];
-//        if (beanId.substring(beanId.length()-1).equals("]")){
-//            beanId = beanId.substring(0, beanId.length()-1);
-//        }
-//        String firstNameString = cellValue.trim().substring(1, cellValue.length() - 1);
-//        
-//            xmlNameString = boxNameString.split(":")[0];            
-//        } else 
-//            xmlNameString = boxNameString;
-//        else {
-//            firstNameString = cellValue.trim().substring(1, cellValue.length() - 2);
-//        }
+    private void setXmlName(String path, String cellValue) {
+        boxName = cellValue.toString().trim().substring(1, cellValue.length() - 1).split("]")[0].replace(":", "-");
+        String firstBoxName = boxName.split("-")[0];
+        String[] name = firstBoxName.split("\\.");
+        beanId = firstBoxName.replace(".", "_");
+        beanDirectory = path + beanId + ".xml";
+        variant = name[1];
+        revision = name[name.length - 1];
     }
 
     private void setProductNumber(String cellValue) {
         if (!cellValue.isEmpty() && cellValue.substring(0, 1).equals("#") && productNumber.equals(UNSET)) {
             productNumber = cellValue.substring(1).trim();
-            formatHead();
+            //            formatHead();
         }
     }
 
-    private boolean matchBoxName(String cellValue) {
-        // [ACU.2125.R1] \\D+. R\\d 
-        String expReg = "\\[\\D+.[\\s\\S]+R\\d+[\\s\\S]?\\]";
-        boolean m = cellValue.matches(expReg);
-        return m;
+    private void formatBeanGeneratorSwitch(List<String> switchPaths) {
+        if (switchPaths.isEmpty())
+            return;
+        for (int i = 1; i < switchPaths.size(); i++) {
+            String path = switchPaths.get(i);
+            beanGeneratorSwitch.addTabIncent(1);
+            beanGeneratorSwitch
+                    .addString(String
+                            .format("<bean id=\"%s\" class=\"com.ericsson.radio.test.ctr.helpers.arptoinstrumentpath.configuration.Switch\">\n",
+                                    "parent" + path));
+            beanGeneratorSwitch.addTabIncent(2);
+            beanGeneratorSwitch.addString(String.format("<property name=\"name\" value=\"%s\" />\n", path));
+            beanGeneratorSwitch.addTabIncent(2);
+            beanGeneratorSwitch.addString(String.format("<property name=\"order\" value=\"%s\" />\n", i));
+            beanGeneratorSwitch.addTabIncent(1);
+            beanGeneratorSwitch.addString(String.format("</bean>\n\n"));
+        }
     }
 
-    private void formatSwitchPathReference(List<String> switchPaths, List<String> switchParentName) {
+    private void formatBeanGeneratorSwitchPath(List<String> switchPaths, List<String> switchParentName) {
+        if (switchPaths.isEmpty())
+            return;
         for (int i = 0; i < switchPaths.size(); i++) {
             String path = switchPaths.get(i);
             switch (i) {
             case 0:
-                beanGeneratorSwitchBoxConfigurtion.formatBeanSwitchBoxConfigurationClass(path);
-                beanGeneratorSwitchPath.addStringSwitchPathClass(path);
+                beanGeneratorSwitchPath.addTabIncent(1);
+                beanGeneratorSwitchPath
+                        .addString(String
+                                .format("<bean id=\"%s\" class=\"com.ericsson.radio.test.ctr.helpers.arptoinstrumentpath.configuration.SwitchPath\">\n",
+                                        path));
                 beanGeneratorSwitchPath.addTabIncent(2);
-                beanGeneratorSwitchPath.addString("<property name=\"switches\">");
-                beanGeneratorSwitchPath.addNewLine();
+                beanGeneratorSwitchPath.addString("<property name=\"switches\">\n");
                 beanGeneratorSwitchPath.addTabIncent(3);
-                beanGeneratorSwitchPath.addString("<list>");
-                beanGeneratorSwitchPath.addNewLine();
+                beanGeneratorSwitchPath.addString("<list>\n");
                 break;
             default:
                 beanGeneratorSwitchPath.addTabIncent(4);
                 if (Double.parseDouble(path) == 0) {
                     String referenceIdForParent = "parent" + switchParentName.get(i);
-                    beanGeneratorSwitchPath.addString(String.format("<ref bean=\"%s\" />", referenceIdForParent));
-                    beanGeneratorSwitchPath.addNewLine();
+                    beanGeneratorSwitchPath.addString(String.format("<ref bean=\"%s\" />\n", referenceIdForParent));
                 } else if (Double.parseDouble(path) > 0) {
                     String switchParent = switchParentName.get(i);
                     int position = (int) Double.parseDouble(path);
                     String referenceId = switchParentName.get(i) + "-" + position;
-                    beanGeneratorSwitchPath.addString(String.format("<ref bean=\"%s\" />", referenceId));
-                    beanGeneratorSwitchPath.addNewLine();
-                    if (!referenceIdStrings.contains(referenceId)) {
-                        beanGeneratorSwitchChild.generateSwitchChildReference(switchParent, referenceId, position);
-                        referenceIdStrings.add(referenceId);
-                    }
+                    beanGeneratorSwitchPath.addString(String.format("<ref bean=\"%s\" />\n", referenceId));
+                    formatBeanGeneratorSwitchPathChild(referenceId, switchParent, position);
                 } else {
                     throw new RuntimeException("Unsupport value : " + path);
                 }
@@ -215,67 +189,87 @@ public class ExcelToBean
             }
         }
         beanGeneratorSwitchPath.addTabIncent(3);
-        beanGeneratorSwitchPath.addListEnd();
-        beanGeneratorSwitchPath.addNewLine();
+        beanGeneratorSwitchPath.addString("</list>\n");
         beanGeneratorSwitchPath.addTabIncent(2);
-        beanGeneratorSwitchPath.addPropertyEnd();
-        beanGeneratorSwitchPath.addNewLine();
+        beanGeneratorSwitchPath.addString("</property>\n");
         beanGeneratorSwitchPath.addTabIncent(1);
-        beanGeneratorSwitchPath.addBeanEnd();
-        beanGeneratorSwitchPath.addNewLine();
-        beanGeneratorSwitchPath.addNewLine();
-        System.out.println(beanGeneratorSwitchPath.getBeanString());
+        beanGeneratorSwitchPath.addString("</bean>\n\n");
+        //        System.out.println(beanGeneratorSwitchPath.getBeanString());
     }
 
-    private void formatHead() {
+    private void formatBeanGeneratorSwitchPathChild(String referenceId, String switchParent, int position) {
+        if (!referenceIdStrings.contains(referenceId)) {
+            //                        beanGeneratorSwitchChild.generateSwitchChildReference(switchParent, referenceId, position);
+            beanGeneratorSwitchChild.addTabIncent(1);
+            beanGeneratorSwitchChild.addString(String.format("<bean id=\"%s\" parent=\"%s\">\n",
+                    referenceId, "parent" + switchParent));
+            beanGeneratorSwitchChild.addTabIncent(2);
+            beanGeneratorSwitchChild.addString(String.format(
+                    "<property name=\"position\" value = \"%d\" />\n", position));
+            beanGeneratorSwitchChild.addTabIncent(1);
+            beanGeneratorSwitchChild.addString(String.format("</bean>\n\n"));
+            referenceIdStrings.add(referenceId);
+        }
+    }
+
+    private void formatBeanGeneratorSwitchBoxConfigurtionRefs(List<String> switchPaths) {
+        if (switchPaths.isEmpty())
+            return;
+        //        beanGeneratorSwitchBoxConfigurtion.formatBeanSwitchBoxConfigurationClass(switchPaths.get(0));
+        beanGeneratorSwitchBoxConfigurtion.addTabIncent(4);
+        beanGeneratorSwitchBoxConfigurtion.addString(String.format("<ref bean=\"%s\" />\n", switchPaths.get(0)));
+
+    }
+
+    //    private void formatBeanGeneratorSwitchChild(List<String> switchPaths, List<String> switchParentName) {
+    //        if (switchPaths.isEmpty())
+    //            return;
+    //        for (int i = 0; i < switchPaths.size(); i++) {
+    //            String path = switchPaths.get(i);
+    //            if (i >0) {
+    //                String switchParent = switchParentName.get(i);
+    //                int position = (int) Double.parseDouble(path);
+    //                String referenceId = switchParentName.get(i) + "-" + position;
+    //                if (!referenceIdStrings.contains(referenceId)) {
+    //                    beanGeneratorSwitchChild.generateSwitchChildReference(switchParent, referenceId, position);
+    //                    referenceIdStrings.add(referenceId);
+    //                }
+    //            }
+    //        }
+    //    }
+
+    private void formatBeanGeneratorSwitchBoxConfigurtionHead() {
+        if (!beanGeneratorSwitchBoxConfigurtion.getBeanString().isEmpty())
+            return;
+        beanGeneratorSwitchBoxConfigurtion.addTabIncent(1);
+        beanGeneratorSwitchBoxConfigurtion.addString(String.format("<!-- %s -->\n", boxName));
         beanGeneratorSwitchBoxConfigurtion.addTabIncent(1);
         beanGeneratorSwitchBoxConfigurtion
                 .addString(String
-                        .format("<bean id=\"%s\" class=\"com.ericsson.radio.test.ctr.helpers.arptoinstrumentpath.configuration.SwitchBoxConfiguration\">",
+                        .format("<bean id=\"%s\" class=\"com.ericsson.radio.test.ctr.helpers.arptoinstrumentpath.configuration.SwitchBoxConfiguration\">\n",
                                 beanId));
-        beanGeneratorSwitchBoxConfigurtion.addNewLine();
         beanGeneratorSwitchBoxConfigurtion.addTabIncent(2);
-        beanGeneratorSwitchBoxConfigurtion.addString(String.format("<property name=\"variant\" value=\"%s\" />",
+        beanGeneratorSwitchBoxConfigurtion.addString(String.format("<property name=\"variant\" value=\"%s\" />\n",
                 variant));
-        beanGeneratorSwitchBoxConfigurtion.addNewLine();
         beanGeneratorSwitchBoxConfigurtion.addTabIncent(2);
-        beanGeneratorSwitchBoxConfigurtion.addString(String.format("<property name=\"revision\" value=\"%s\" />",
+        beanGeneratorSwitchBoxConfigurtion.addString(String.format("<property name=\"revision\" value=\"%s\" />\n",
                 revision));
-        beanGeneratorSwitchBoxConfigurtion.addNewLine();
         beanGeneratorSwitchBoxConfigurtion.addTabIncent(2);
-        beanGeneratorSwitchBoxConfigurtion.addString(String.format("<property name=\"productNumber\" value=\"%s\" />",
-                productNumber));
-        beanGeneratorSwitchBoxConfigurtion.addNewLine();
+        beanGeneratorSwitchBoxConfigurtion.addString(String.format(
+                "<property name=\"productNumber\" value=\"%s\" />\n", productNumber));
         beanGeneratorSwitchBoxConfigurtion.addTabIncent(2);
-        beanGeneratorSwitchBoxConfigurtion.addString(String.format("<property name=\"switchPaths\">"));
-        beanGeneratorSwitchBoxConfigurtion.addNewLine();
+        beanGeneratorSwitchBoxConfigurtion.addString(String.format("<property name=\"switchPaths\">\n"));
         beanGeneratorSwitchBoxConfigurtion.addTabIncent(3);
-        beanGeneratorSwitchBoxConfigurtion.addString(String.format("<list>"));
+        beanGeneratorSwitchBoxConfigurtion.addString(String.format("<list>\n"));
     }
 
-    private void formatEnd() {
-
-        beanGeneratorSwitchBoxConfigurtion.addNewLine();
-
+    private void formatBeanGeneratorSwitchBoxConfigurtionEnd() {
         beanGeneratorSwitchBoxConfigurtion.addTabIncent(3);
-        beanGeneratorSwitchBoxConfigurtion.addListEnd();
-        beanGeneratorSwitchBoxConfigurtion.addNewLine();
+        beanGeneratorSwitchBoxConfigurtion.addString("</list>\n");
         beanGeneratorSwitchBoxConfigurtion.addTabIncent(2);
-        beanGeneratorSwitchBoxConfigurtion.addPropertyEnd();
-        beanGeneratorSwitchBoxConfigurtion.addNewLine();
+        beanGeneratorSwitchBoxConfigurtion.addString("</property>\n");
         beanGeneratorSwitchBoxConfigurtion.addTabIncent(1);
-        beanGeneratorSwitchBoxConfigurtion.addBeanEnd();
-        beanGeneratorSwitchBoxConfigurtion.addNewLine();
-        beanGeneratorSwitchBoxConfigurtion.addNewLine();
-    }
-
-    private void formatSwitchPathParent(List<String> switchPaths) {
-        for (int i = 0; i < switchPaths.size(); i++) {
-            if (i == 0)
-                continue;
-            String path = switchPaths.get(i);
-            beanGeneratorSwitch.addSwitchClass(path, i);
-        }
+        beanGeneratorSwitchBoxConfigurtion.addString("</bean>\n\n");
     }
 
     private static String getCellValue(Cell cell) {
