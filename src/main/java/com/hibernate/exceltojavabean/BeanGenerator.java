@@ -1,24 +1,25 @@
 package com.hibernate.exceltojavabean;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-
+import java.util.Map;
+import java.util.ResourceBundle;
 
 public class BeanGenerator {
 
     private String beanString = "";
-    protected String beanId;
-    protected String className;
-    protected List<String> properties = new ArrayList<>();
-    protected List<String> refs = new ArrayList<>();
+    private String beanId;
+    private String className;
+    private List<String> refs = new ArrayList<>();
+    private Map<String, String> properties = new HashMap<>();
+    private String propertyNameForList;
 
-    protected void addTabIncent(int incentTimes) {
-        for (int i = 1; i <= incentTimes; i++)
-            setBeanString("    ");
-    }
-
-    protected void addString(String string) {
-        setBeanString(string);
+    /**
+     * @return the refsOfSwitchPath
+     */
+    public List<String> getRefsOfSwitchPath() {
+        return refs;
     }
 
     /**
@@ -35,48 +36,73 @@ public class BeanGenerator {
         this.beanString += beanString;
     }
 
-    protected void setBeanClassBegin(String beanId, String clazz) {
-        setBeanString(String.format("<bean id=\"%s\" class=\"%s\">\n", beanId, clazz));
+    /**
+     * @return the beanId
+     */
+    public String getBeanId() {
+        return beanId;
     }
 
-    protected void setBeanChildBegin(String beanId, String parentId) {
-        setBeanString(String.format("<bean id=\"%s\" parent=\"%s\">\n", beanId, parentId));
+    /**
+     * @param beanId the beanId to set
+     */
+    public void setBeanId(String beanId) {
+        this.beanId = beanId;
     }
 
-    protected void setBeanEnd() {
-        setBeanString("</bean>\n\n");
+    /**
+     * @param className the className to set
+     */
+    public void setClassName(String className) {
+        this.className = className;
     }
 
-    protected void setPropertyBegin(String name) {
-        setBeanString(String.format("<property name=\"%s\">\n", name));
+    /**
+     * @return the properties
+     */
+    public Map<String, String> getProperties() {
+        return properties;
     }
 
-    protected void setProperty(String name, String value) {
-        setBeanString(String.format("<property name=\"%s\" value=\"%s\" />\n", name, value));
+    /**
+     * @return the refs
+     */
+    public List<String> getRefs() {
+        return refs;
     }
 
-    protected void setPropertyEnd() {
-        setBeanString("</property>\n");
+    protected String buildHead() {
+        ResourceBundle modelPropertiesBundle = ResourceBundle.getBundle("model");
+        //        if (modelPropertiesBundle.containsKey(("beanHead"))) {
+        return modelPropertiesBundle.getString("beanHead");
+        //        }
     }
 
-    protected void setListBegin() {
-        setBeanString("<list>\n");
+    protected String buildEnd() {
+        return "</beans>";
     }
 
-    protected void setListEnd() {
-        setBeanString("</list>\n");
+    protected void setPropertyNameForList(String name) {
+        propertyNameForList = name;
     }
 
-    protected void setRefCall(String refId) {
-        setBeanString(String.format("<ref bean=\"%s\" />\n", refId));
+    protected void build() {
+        setBeanString(String.format("\t<bean id=\"%s\" class=\"%s\">\n", beanId, className));
+        properties.forEach((k, v) -> setBeanString(String.format("\t\t<property name=\"%s\" value=\"%s\" />\n", k, v)));
+        if (!refs.isEmpty()) {
+            setBeanString(String.format("\t\t<property name=\"%s\">\n", propertyNameForList));
+            setBeanString("\t\t\t<list>\n");
+            refs.forEach((ref) -> setBeanString(String.format("\t\t\t\t<ref bean=\"%s\" />\n", ref)));
+            setBeanString("\t\t\t</list>\n");
+            setBeanString("\t\t</property>\n");
+        }
+        setBeanString("\t</bean>\n\n");
     }
 
-    protected void addComment(String comment) {
-        setBeanString(String.format("<!-- %s -->\n", comment));
-    }
-
-    protected void addBean(BeanGenerator beanGeneratorSwitchBoxConfigurationPropertySwitchPaths) {
-        setBeanString(beanGeneratorSwitchBoxConfigurationPropertySwitchPaths.getBeanString());
+    protected void buildParent(String beanId, String parent) {
+        setBeanString(String.format("\t<bean id=\"%s\" parent=\"%s\">\n", beanId, parent));
+        properties.forEach((k, v) -> setBeanString(String.format("\t\t<property name=\"%s\" value=\"%s\" />\n", k, v)));
+        setBeanString("\t</bean>\n\n");
     }
 
 }

@@ -48,6 +48,7 @@ public class ExcelToBean
     private String revision = "";
     private String beanId;
     HSSFWorkbook workbook;
+    List<String> refs = new ArrayList<>();
 
     private void parseExcelCustom(Workbook workbook, String path) throws IOException {
         parseExcelCustom(workbook, path, "", 0, 0);
@@ -65,8 +66,9 @@ public class ExcelToBean
         }
         int startRowNum = getStartRowNum(startRowIndex);
         String head = getCellValue(sheet.getRow(startRowNum).getCell(0));
-        extractBeanId(path, head);
+        parseBoxName(path, head);
         int cellNum = sheet.getRow(startRowNum + 1).getPhysicalNumberOfCells();
+
         for (int rowIndex = startRowNum; rowIndex < getEndRowNum(endRowIndex, sheet); rowIndex++) { //row  
             if (rowIndex == startRowNum + 2)
                 continue;
@@ -81,16 +83,21 @@ public class ExcelToBean
                     switchPaths.add(cellIndex, cellValue);
             }
             formatBeanGeneratorSwitchPath(switchPaths, switchParentName);
-            formatbeanGeneratorSwitchBoxConfigurationSwitchPathsRefList(switchPaths);
+            if (!switchPaths.isEmpty())
+                refs.add(switchPaths.get(0));
         }
         formatBeanGeneratorSwitch(switchParentName);
         formatBeanGeneratorSwitchBoxConfigurtion();
-        GenerateBean.generatNewBean("C:\\Users\\EKUIWAG\\Desktop\\bean-head.xml", beanDirectory);
+        beanGeneratorSwitchBoxConfigurtion.buildHead();
+        //        GenerateBean.generatNewBean("C:\\Users\\EKUIWAG\\Desktop\\bean-head.xml", beanDirectory);
+        //        GenerateBean.generatNewBean(beanDirectory, beanGeneratorSwitchBoxConfigurtion.buildHead());
+        GenerateBean.writeBeans(beanDirectory, beanGeneratorSwitchBoxConfigurtion.buildHead());
+        //        GenerateBean.writeBeans(beanDirectory, beanGeneratorSwitchBoxConfigurtion.buildHead());
         GenerateBean.writeBeans(beanDirectory, beanGeneratorSwitchBoxConfigurtion.getBeanString());
         GenerateBean.writeBeans(beanDirectory, beanGeneratorSwitchPath.getBeanString());
         GenerateBean.writeBeans(beanDirectory, beanGeneratorSwitchChild.getBeanString());
         GenerateBean.writeBeans(beanDirectory, beanGeneratorSwitch.getBeanString());
-        GenerateBean.writeEndBeans(beanDirectory);
+        GenerateBean.writeBeans(beanDirectory, beanGeneratorSwitchBoxConfigurtion.buildEnd());
     }
 
     private int getEndRowNum(int endRowIndex, HSSFSheet sheet) {
@@ -105,7 +112,7 @@ public class ExcelToBean
         return 0;
     }
 
-    private void extractBeanId(String path, String cellValue) {
+    private void parseBoxName(String path, String cellValue) {
         boxName = cellValue.toString().trim().substring(1, cellValue.length() - 1).split("]")[0].replace(":", "-");
         String firstBoxName = boxName.split("-")[0];
         String[] name = firstBoxName.split("\\.");
@@ -118,7 +125,6 @@ public class ExcelToBean
     private void setProductNumber(String cellValue) {
         if (!cellValue.isEmpty() && cellValue.substring(0, 1).equals("#") && productNumber.equals(UNSET)) {
             productNumber = cellValue.substring(1).trim();
-            //            formatHead();
         }
     }
 
@@ -127,15 +133,13 @@ public class ExcelToBean
             return;
         for (int i = 1; i < switchPaths.size(); i++) {
             String path = switchPaths.get(i);
-            beanGeneratorSwitch.addTabIncent(1);
-            beanGeneratorSwitch.setBeanClassBegin("parent" + path,
-                    "com.ericsson.radio.test.ctr.helpers.arptoinstrumentpath.configuration.Switch");
-            beanGeneratorSwitch.addTabIncent(2);
-            beanGeneratorSwitch.setProperty("name", path);
-            beanGeneratorSwitch.addTabIncent(2);
-            beanGeneratorSwitch.setProperty("order", String.valueOf(i));
-            beanGeneratorSwitch.addTabIncent(1);
-            beanGeneratorSwitch.setBeanEnd();
+            beanGeneratorSwitch.setBeanId(path);
+            beanGeneratorSwitch
+                    .setClassName("com.ericsson.radio.test.ctr.helpers.arptoinstrumentpath.configuration.Switch");
+            beanGeneratorSwitch.getProperties().put("name", path);
+            beanGeneratorSwitch.getProperties().put("order", String.valueOf(i));
+            //            beanGeneratorSwitch.buildSwitch(path, "com.ericsson.radio.test.ctr.helpers.arptoinstrumentpath.configuration.Switch");
+            beanGeneratorSwitch.build();
         }
     }
 
@@ -144,87 +148,63 @@ public class ExcelToBean
             return;
         for (int i = 0; i < switchPaths.size(); i++) {
             String path = switchPaths.get(i);
-            switch (i) {
-            case 0:
-                beanGeneratorSwitchPath.addTabIncent(1);
-                beanGeneratorSwitchPath.setBeanClassBegin(path,
-                        "com.ericsson.radio.test.ctr.helpers.arptoinstrumentpath.configuration.SwitchPath");
-                beanGeneratorSwitchPath.addTabIncent(2);
-                beanGeneratorSwitchPath.setPropertyBegin("switches");
-                beanGeneratorSwitchPath.addTabIncent(3);
-                beanGeneratorSwitchPath.setListBegin();
-                break;
-            default:
-                beanGeneratorSwitchPath.addTabIncent(4);
-                String referenceId;
-                if (path.isEmpty())
-                    continue;
-                if (Double.parseDouble(path) == 0) {
-                    referenceId = "parent" + switchParentName.get(i);
-                } else if (Double.parseDouble(path) > 0) {
-                    String switchParent = switchParentName.get(i);
-                    int position = (int) Double.parseDouble(path);
-                    referenceId = switchParentName.get(i) + "-" + position;
-                    formatBeanGeneratorSwitchPathChild(referenceId, switchParent, position);
-                } else {
-                    throw new RuntimeException("Unsupport value : " + path);
-                }
-                beanGeneratorSwitchPath.setRefCall(referenceId);
-                break;
+            if (i == 0) {
+                beanGeneratorSwitchPath.setBeanId(path);
+                continue;
             }
+            String referenceId;
+            if (path.isEmpty())
+                continue;
+            if (Double.parseDouble(path) == 0) {
+                referenceId = "parent" + switchParentName.get(i);
+            } else if (Double.parseDouble(path) > 0) {
+                String switchParent = switchParentName.get(i);
+                int position = (int) Double.parseDouble(path);
+                referenceId = switchParentName.get(i) + "-" + position;
+                formatBeanGeneratorSwitchPathChild(referenceId, switchParent, position);
+            } else {
+                throw new RuntimeException("Unsupport value : " + path);
+            }
+            beanGeneratorSwitchPath.getRefsOfSwitchPath().add(referenceId);
         }
-        beanGeneratorSwitchPath.addTabIncent(3);
-        beanGeneratorSwitchPath.setListEnd();
-        beanGeneratorSwitchPath.addTabIncent(2);
-        beanGeneratorSwitchPath.setPropertyEnd();
-        beanGeneratorSwitchPath.addTabIncent(1);
-        beanGeneratorSwitchPath.setBeanEnd();
+        beanGeneratorSwitchPath
+                .setClassName("com.ericsson.radio.test.ctr.helpers.arptoinstrumentpath.configuration.SwitchPath");
+        beanGeneratorSwitchPath.setPropertyNameForList("switches");
+        //        beanGeneratorSwitchPath.hasRefs();
+        //        beanGeneratorSwitchPath.buildSwitchPath();
+        beanGeneratorSwitchPath.build();
+        beanGeneratorSwitchPath.getRefsOfSwitchPath().clear();
     }
 
     private void formatBeanGeneratorSwitchPathChild(String referenceId, String switchParent, int position) {
         if (!referenceIdStrings.contains(referenceId)) {
-            beanGeneratorSwitchChild.addTabIncent(1);
-            beanGeneratorSwitchChild.setBeanChildBegin(referenceId, "parent" + switchParent);
-            beanGeneratorSwitchChild.addTabIncent(2);
-            beanGeneratorSwitchChild.setProperty("position", String.valueOf(position));
-            beanGeneratorSwitchChild.addTabIncent(1);
-            beanGeneratorSwitchChild.setBeanEnd();
+            beanGeneratorSwitchChild.setBeanId(referenceId);
+            beanGeneratorSwitchChild.getProperties().put("position", String.valueOf(position));
+            beanGeneratorSwitchChild.buildParent(referenceId, "parent" + switchParent);
+            //            beanGeneratorSwitchChild.build();
             referenceIdStrings.add(referenceId);
         }
     }
 
     private void formatbeanGeneratorSwitchBoxConfigurationSwitchPathsRefList(List<String> switchPaths) {
-        if (switchPaths.isEmpty())
-            return;
-        beanGeneratorSwitchBoxConfigurationSwitchPathsRefList.addTabIncent(4);
-        beanGeneratorSwitchBoxConfigurationSwitchPathsRefList.setRefCall(switchPaths.get(0));
+        if (!switchPaths.isEmpty())
+            beanGeneratorSwitchBoxConfigurtion.getRefs().add(switchPaths.get(0));
     }
 
     private void formatBeanGeneratorSwitchBoxConfigurtion() {
         if (!beanGeneratorSwitchBoxConfigurtion.getBeanString().isEmpty())
             return;
-        beanGeneratorSwitchBoxConfigurtion.addTabIncent(1);
-        beanGeneratorSwitchBoxConfigurtion.addComment(boxName);
-        beanGeneratorSwitchBoxConfigurtion.addTabIncent(1);
-        beanGeneratorSwitchBoxConfigurtion.setBeanClassBegin(beanId,
-                "com.ericsson.radio.test.ctr.helpers.arptoinstrumentpath.configuration.SwitchBoxConfiguration");
-        beanGeneratorSwitchBoxConfigurtion.addTabIncent(2);
-        beanGeneratorSwitchBoxConfigurtion.setProperty("variant", variant);
-        beanGeneratorSwitchBoxConfigurtion.addTabIncent(2);
-        beanGeneratorSwitchBoxConfigurtion.setProperty("revision", revision);
-        beanGeneratorSwitchBoxConfigurtion.addTabIncent(2);
-        beanGeneratorSwitchBoxConfigurtion.setProperty("productNumber", productNumber);
-        beanGeneratorSwitchBoxConfigurtion.addTabIncent(2);
-        beanGeneratorSwitchBoxConfigurtion.setPropertyBegin("switchPaths");
-        beanGeneratorSwitchBoxConfigurtion.addTabIncent(3);
-        beanGeneratorSwitchBoxConfigurtion.setListBegin();
-        beanGeneratorSwitchBoxConfigurtion.addBean(beanGeneratorSwitchBoxConfigurationSwitchPathsRefList);
-        beanGeneratorSwitchBoxConfigurtion.addTabIncent(3);
-        beanGeneratorSwitchBoxConfigurtion.setListEnd();
-        beanGeneratorSwitchBoxConfigurtion.addTabIncent(2);
-        beanGeneratorSwitchBoxConfigurtion.setPropertyEnd();
-        beanGeneratorSwitchBoxConfigurtion.addTabIncent(1);
-        beanGeneratorSwitchBoxConfigurtion.setBeanEnd();
+        beanGeneratorSwitchBoxConfigurtion.setBeanId(beanId);
+        beanGeneratorSwitchBoxConfigurtion
+                .setClassName("com.ericsson.radio.test.ctr.helpers.arptoinstrumentpath.configuration.SwitchBoxConfiguration");
+        beanGeneratorSwitchBoxConfigurtion.setPropertyNameForList("switchPaths");
+        beanGeneratorSwitchBoxConfigurtion.getProperties().put("variant", variant);
+        beanGeneratorSwitchBoxConfigurtion.getProperties().put("revision", revision);
+        beanGeneratorSwitchBoxConfigurtion.getProperties().put("productNumber", productNumber);
+        beanGeneratorSwitchBoxConfigurtion.getRefs().addAll(refs);
+        //        beanGeneratorSwitchBoxConfigurtion.buildSwitchBoxConfiguration();
+        beanGeneratorSwitchBoxConfigurtion.build();
+
     }
 
     private static String getCellValue(Cell cell) {
@@ -281,7 +261,8 @@ public class ExcelToBean
 
     @BeforeTest
     @Parameters({ "excelDirectory" })
-    public void beforeClass(String excelDirectory) throws FileNotFoundException, IOException {
+    public void beforeClass(@Optional("C:\\Users\\EKUIWAG\\Desktop\\NGTE\\NGTE.xls") String excelDirectory)
+            throws FileNotFoundException, IOException {
         workbook = new HSSFWorkbook(new FileInputStream(excelDirectory));
     }
 
