@@ -1,153 +1,204 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <suite name="Suite" parallel="false">
+    <parameter name="excelDirectory" value="C:\Users\EKUIWAG\Desktop\NGTE\NGTE.xls" />
     <test name="BCCU01">
         <classes>
             <class name="com.hibernate.exceltojavabean.ExcelToBean" />
-            <parameter name="fileName" value="BCCU01" />
+            <parameter name="sheetName" value="BCCU" />
+            <parameter name="startRowIndex" value="21" />
+            <parameter name="endRowIndex" value="32" />
         </classes>
     </test>
     <test name="BCCU02">
         <classes>
             <class name="com.hibernate.exceltojavabean.ExcelToBean" />
-            <parameter name="fileName" value="BCCU02" />
+            <parameter name="sheetName" value="BCCU" />
+            <parameter name="startRowIndex" value="34" />
+            <parameter name="endRowIndex" value="46" />
         </classes>
     </test>
     <test name="BCCU03">
         <classes>
             <class name="com.hibernate.exceltojavabean.ExcelToBean" />
-            <parameter name="fileName" value="BCCU03" />
+            <parameter name="sheetName" value="BCCU" />
+            <parameter name="startRowIndex" value="48" />
+            <parameter name="endRowIndex" value="58" />
         </classes>
     </test>
     <test name="BFU01">
         <classes>
             <class name="com.hibernate.exceltojavabean.ExcelToBean" />
-            <parameter name="fileName" value="BFU01" />
+            <parameter name="sheetName" value="BFU" />
+            <parameter name="startRowIndex" value="23" />
+            <parameter name="endRowIndex" value="43" />
         </classes>
     </test>
     <test name="BFU02">
         <classes>
             <class name="com.hibernate.exceltojavabean.ExcelToBean" />
-            <parameter name="fileName" value="BFU02" />
+            <parameter name="sheetName" value="BFU" />
+            <parameter name="startRowIndex" value="45" />
+            <parameter name="endRowIndex" value="65" />
         </classes>
     </test>
     <test name="BFU03">
         <classes>
             <class name="com.hibernate.exceltojavabean.ExcelToBean" />
-            <parameter name="fileName" value="BFU03" />
+            <parameter name="sheetName" value="BFU" />
+            <parameter name="startRowIndex" value="67" />
+            <parameter name="endRowIndex" value="77" />
         </classes>
     </test>
     <test name="BFU04">
         <classes>
             <class name="com.hibernate.exceltojavabean.ExcelToBean" />
-            <parameter name="fileName" value="BFU04" />
+            <parameter name="sheetName" value="BFU" />
+            <parameter name="startRowIndex" value="79" />
+            <parameter name="endRowIndex" value="97" />
         </classes>
     </test>
     <test name="BFU05">
         <classes>
             <class name="com.hibernate.exceltojavabean.ExcelToBean" />
-            <parameter name="fileName" value="BFU05" />
+            <parameter name="sheetName" value="BFU" />
+            <parameter name="startRowIndex" value="100" />
+            <parameter name="endRowIndex" value="117" />
         </classes>
     </test>
     <test name="BFU06">
         <classes>
             <class name="com.hibernate.exceltojavabean.ExcelToBean" />
-            <parameter name="fileName" value="BFU06" />
+            <parameter name="sheetName" value="BFU" />
+            <parameter name="startRowIndex" value="120" />
+            <parameter name="endRowIndex" value="137" />
         </classes>
     </test>
     <test name="BPAU01">
         <classes>
             <class name="com.hibernate.exceltojavabean.ExcelToBean" />
-            <parameter name="fileName" value="BPAU01" />
+            <parameter name="sheetName" value="BPAU" />
+            <parameter name="startRowIndex" value="14" />
+            <parameter name="endRowIndex" value="28" />
         </classes>
     </test>
     <test name="BPAU02">
         <classes>
             <class name="com.hibernate.exceltojavabean.ExcelToBean" />
-            <parameter name="fileName" value="BPAU02" />
+            <parameter name="sheetName" value="BPAU" />
+            <parameter name="startRowIndex" value="30" />
+            <parameter name="endRowIndex" value="48" />
         </classes>
     </test>
     <test name="BTDF01">
         <classes>
             <class name="com.hibernate.exceltojavabean.ExcelToBean" />
-            <parameter name="fileName" value="BTDF01" />
+            <parameter name="sheetName" value="BTDF" />
+            <parameter name="startRowIndex" value="15" />
+            <parameter name="endRowIndex" value="18" />
         </classes>
     </test>
     <test name="BTDM01">
         <classes>
             <class name="com.hibernate.exceltojavabean.ExcelToBean" />
-            <parameter name="fileName" value="BTDM01" />
+            <parameter name="sheetName" value="BTDM" />
+            <parameter name="startRowIndex" value="15" />
+            <parameter name="endRowIndex" value="32" />
         </classes>
     </test>
     <test name="FPMU01">
         <classes>
             <class name="com.hibernate.exceltojavabean.ExcelToBean" />
-            <parameter name="fileName" value="FPMU01" />
+            <parameter name="sheetName" value="FPMU" />
+            <parameter name="startRowIndex" value="13" />
+            <parameter name="endRowIndex" value="81" />
         </classes>
     </test>
     <test name="LPMU01">
         <classes>
             <class name="com.hibernate.exceltojavabean.ExcelToBean" />
-            <parameter name="fileName" value="LPMU01" />
+            <parameter name="sheetName" value="LPMU" />
+            <parameter name="startRowIndex" value="26" />
+            <parameter name="endRowIndex" value="47" />
         </classes>
     </test>
     <test name="LPMU02">
         <classes>
             <class name="com.hibernate.exceltojavabean.ExcelToBean" />
-            <parameter name="fileName" value="LPMU02" />
+            <parameter name="sheetName" value="LPMU" />
+            <parameter name="startRowIndex" value="49" />
+            <parameter name="endRowIndex" value="70" />
         </classes>
     </test>
     <test name="LPMU03">
         <classes>
             <class name="com.hibernate.exceltojavabean.ExcelToBean" />
-            <parameter name="fileName" value="LPMU03" />
+            <parameter name="sheetName" value="LPMU" />
+            <parameter name="startRowIndex" value="72" />
+            <parameter name="endRowIndex" value="84" />
         </classes>
     </test>
     <test name="LPMU04">
         <classes>
             <class name="com.hibernate.exceltojavabean.ExcelToBean" />
-            <parameter name="fileName" value="LPMU04" />
+            <parameter name="sheetName" value="LPMU" />
+            <parameter name="startRowIndex" value="86" />
+            <parameter name="endRowIndex" value="102" />
         </classes>
     </test>
     <test name="TMU01">
         <classes>
             <class name="com.hibernate.exceltojavabean.ExcelToBean" />
-            <parameter name="fileName" value="TMU01" />
+            <parameter name="sheetName" value="TMU" />
+            <parameter name="startRowIndex" value="14" />
+            <parameter name="endRowIndex" value="57" />
         </classes>
     </test>
     <test name="TMU02">
         <classes>
             <class name="com.hibernate.exceltojavabean.ExcelToBean" />
-            <parameter name="fileName" value="TMU02" />
+            <parameter name="sheetName" value="TMU" />
+            <parameter name="startRowIndex" value="59" />
+            <parameter name="endRowIndex" value="102" />
         </classes>
     </test>
     <test name="RCU01">
         <classes>
             <class name="com.hibernate.exceltojavabean.ExcelToBean" />
-            <parameter name="fileName" value="RCU01" />
+            <parameter name="sheetName" value="RCU" />
+            <parameter name="startRowIndex" value="13" />
+            <parameter name="endRowIndex" value="27" />
         </classes>
     </test>
     <test name="RMU01">
         <classes>
             <class name="com.hibernate.exceltojavabean.ExcelToBean" />
-            <parameter name="fileName" value="RMU01" />
+            <parameter name="sheetName" value="RMU" />
+            <parameter name="startRowIndex" value="12" />
+            <parameter name="endRowIndex" value="59" />
         </classes>
     </test>
     <test name="ECU01">
         <classes>
             <class name="com.hibernate.exceltojavabean.ExcelToBean" />
-            <parameter name="fileName" value="ECU01" />
+            <parameter name="sheetName" value="ECU" />
+            <parameter name="startRowIndex" value="13" />
+            <parameter name="endRowIndex" value="22" />
         </classes>
     </test>
     <test name="ECU02">
         <classes>
             <class name="com.hibernate.exceltojavabean.ExcelToBean" />
-            <parameter name="fileName" value="ECU02" />
+            <parameter name="sheetName" value="ECU" />
+            <parameter name="startRowIndex" value="24" />
+            <parameter name="endRowIndex" value="27" />
         </classes>
     </test>
     <test name="ECU03">
         <classes>
             <class name="com.hibernate.exceltojavabean.ExcelToBean" />
-            <parameter name="fileName" value="ECU03" />
+            <parameter name="sheetName" value="ECU" />
+            <parameter name="startRowIndex" value="29" />
+            <parameter name="endRowIndex" value="37" />
         </classes>
     </test>
 </suite>
