@@ -6,42 +6,28 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
 
-import org.apache.poi.hpsf.Variant;
-import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeTest;
-import org.testng.annotations.DataProvider;
 import org.testng.annotations.Optional;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
-
-public class ExcelToBean
-{
+public class ExcelToBean {
 
     private static final String UNSET = "Unset";
-    private static ResourceBundle modelPropertiesBundle;
     private List<String> referenceIdStrings = new ArrayList<>();
     private BeanGenerator beanGeneratorSwitchBoxConfigurtion = new BeanGenerator();
     private BeanGenerator beanGeneratorSwitchChild = new BeanGenerator();
     private BeanGenerator beanGeneratorSwitch = new BeanGenerator();
     private BeanGenerator beanGeneratorSwitchPath = new BeanGenerator();
-    private BeanGenerator beanGeneratorSwitchBoxConfigurationSwitchPathsRefList = new BeanGenerator();
-    private String beanDirectory = "";
+    private String beanFileName = "";
     private String boxName = "";
     private String variant = "";
     private String productNumber = UNSET;
@@ -49,6 +35,23 @@ public class ExcelToBean
     private String beanId;
     HSSFWorkbook workbook;
     List<String> refs = new ArrayList<>();
+
+    @Test
+    @Parameters({ "sheetName", "startRowIndex", "endRowIndex" })
+    public void testNew(
+            @Optional("BPAU") String sheetName,
+            @Optional("14") int startRowIndex,
+            @Optional("28") int endRowIndex) throws Exception {
+        String beanPath = "C:\\Users\\EKUIWAG\\Desktop\\NGTE\\xml\\" + sheetName + "\\";
+        parseExcelCustom(workbook, beanPath, sheetName, startRowIndex, endRowIndex);
+    }
+
+    @BeforeTest
+    @Parameters({ "excelDirectory" })
+    protected void beforeClass(@Optional("C:\\Users\\EKUIWAG\\Desktop\\NGTE\\NGTE.xls") String excelDirectory)
+            throws FileNotFoundException, IOException {
+        workbook = new HSSFWorkbook(new FileInputStream(excelDirectory));
+    }
 
     private void parseExcelCustom(Workbook workbook, String path) throws IOException {
         parseExcelCustom(workbook, path, "", 0, 0);
@@ -61,12 +64,11 @@ public class ExcelToBean
         if (sheetName.isEmpty()) {
             sheet = (HSSFSheet) workbook.getSheetAt(0);
         } else {
-            System.out.println(workbook.getSheet(sheetName));
             sheet = (HSSFSheet) workbook.getSheet(sheetName);
         }
         int startRowNum = getStartRowNum(startRowIndex);
         String head = getCellValue(sheet.getRow(startRowNum).getCell(0));
-        parseBoxName(path, head);
+        parseBoxName(head);
         int cellNum = sheet.getRow(startRowNum + 1).getPhysicalNumberOfCells();
 
         for (int rowIndex = startRowNum; rowIndex < getEndRowNum(endRowIndex, sheet); rowIndex++) { //row  
@@ -82,22 +84,20 @@ public class ExcelToBean
                 else if (rowIndex >= startRowNum + 3) // from third line to collect SPD path data
                     switchPaths.add(cellIndex, cellValue);
             }
-            formatBeanGeneratorSwitchPath(switchPaths, switchParentName);
+            buildBeanGeneratorSwitchPath(switchPaths, switchParentName);
             if (!switchPaths.isEmpty())
-                refs.add(switchPaths.get(0));
+                refs.add(beanId + "-" + switchPaths.get(0));
         }
-        formatBeanGeneratorSwitch(switchParentName);
-        formatBeanGeneratorSwitchBoxConfigurtion();
+        buildBeanGeneratorSwitch(switchParentName);
+        buildBeanGeneratorSwitchBoxConfigurtion();
         beanGeneratorSwitchBoxConfigurtion.buildHead();
-        //        GenerateBean.generatNewBean("C:\\Users\\EKUIWAG\\Desktop\\bean-head.xml", beanDirectory);
-        //        GenerateBean.generatNewBean(beanDirectory, beanGeneratorSwitchBoxConfigurtion.buildHead());
-        GenerateBean.writeBeans(beanDirectory, beanGeneratorSwitchBoxConfigurtion.buildHead());
-        //        GenerateBean.writeBeans(beanDirectory, beanGeneratorSwitchBoxConfigurtion.buildHead());
-        GenerateBean.writeBeans(beanDirectory, beanGeneratorSwitchBoxConfigurtion.getBeanString());
-        GenerateBean.writeBeans(beanDirectory, beanGeneratorSwitchPath.getBeanString());
-        GenerateBean.writeBeans(beanDirectory, beanGeneratorSwitchChild.getBeanString());
-        GenerateBean.writeBeans(beanDirectory, beanGeneratorSwitch.getBeanString());
-        GenerateBean.writeBeans(beanDirectory, beanGeneratorSwitchBoxConfigurtion.buildEnd());
+        //        GenerateBean.generatNewBean("C:\\Users\\EKUIWAG\\Desktop\\bean-head.xml", beanFileName);
+        GenerateBean.writeBeans(path, beanFileName, beanGeneratorSwitchBoxConfigurtion.buildHead(), false);
+        GenerateBean.writeBeans(path, beanFileName, beanGeneratorSwitchBoxConfigurtion.getBeanString(), true);
+        GenerateBean.writeBeans(path, beanFileName, beanGeneratorSwitchPath.getBeanString(), true);
+        GenerateBean.writeBeans(path, beanFileName, beanGeneratorSwitchChild.getBeanString(), true);
+        GenerateBean.writeBeans(path, beanFileName, beanGeneratorSwitch.getBeanString(), true);
+        GenerateBean.writeBeans(path, beanFileName, beanGeneratorSwitchBoxConfigurtion.buildEnd(), true);
     }
 
     private int getEndRowNum(int endRowIndex, HSSFSheet sheet) {
@@ -112,12 +112,12 @@ public class ExcelToBean
         return 0;
     }
 
-    private void parseBoxName(String path, String cellValue) {
+    private void parseBoxName(String cellValue) {
         boxName = cellValue.toString().trim().substring(1, cellValue.length() - 1).split("]")[0].replace(":", "-");
         String firstBoxName = boxName.split("-")[0];
         String[] name = firstBoxName.split("\\.");
         beanId = firstBoxName.replace(".", "_");
-        beanDirectory = path + beanId + ".xml";
+        beanFileName = beanId + ".xml";
         variant = name[1];
         revision = name[name.length - 1];
     }
@@ -128,28 +128,28 @@ public class ExcelToBean
         }
     }
 
-    private void formatBeanGeneratorSwitch(List<String> switchPaths) {
+    private void buildBeanGeneratorSwitch(List<String> switchPaths) {
         if (switchPaths.isEmpty())
             return;
         for (int i = 1; i < switchPaths.size(); i++) {
             String path = switchPaths.get(i);
-            beanGeneratorSwitch.setBeanId(path);
-            beanGeneratorSwitch
-                    .setClassName("com.ericsson.radio.test.ctr.helpers.arptoinstrumentpath.configuration.Switch");
-            beanGeneratorSwitch.getProperties().put("name", path);
-            beanGeneratorSwitch.getProperties().put("order", String.valueOf(i));
-            //            beanGeneratorSwitch.buildSwitch(path, "com.ericsson.radio.test.ctr.helpers.arptoinstrumentpath.configuration.Switch");
-            beanGeneratorSwitch.build();
+            if (!path.isEmpty()) {
+                beanGeneratorSwitch.setBeanId(beanId + "-" + "parent" + path);
+                beanGeneratorSwitch.setClass(BeanGenerator.SWITCH);
+                beanGeneratorSwitch.getProperties().put("name", path);
+                beanGeneratorSwitch.getProperties().put("order", String.valueOf(i));
+                beanGeneratorSwitch.build();                
+            }
         }
     }
 
-    private void formatBeanGeneratorSwitchPath(List<String> switchPaths, List<String> switchParentName) {
+    private void buildBeanGeneratorSwitchPath(List<String> switchPaths, List<String> switchParentName) {
         if (switchPaths.isEmpty())
             return;
         for (int i = 0; i < switchPaths.size(); i++) {
             String path = switchPaths.get(i);
             if (i == 0) {
-                beanGeneratorSwitchPath.setBeanId(path);
+                beanGeneratorSwitchPath.setBeanId(beanId + "-" + path);
                 continue;
             }
             String referenceId;
@@ -165,44 +165,33 @@ public class ExcelToBean
             } else {
                 throw new RuntimeException("Unsupport value : " + path);
             }
-            beanGeneratorSwitchPath.getRefsOfSwitchPath().add(referenceId);
+            beanGeneratorSwitchPath.getRefsOfSwitchPath().add(beanId + "-" + referenceId);
         }
-        beanGeneratorSwitchPath
-                .setClassName("com.ericsson.radio.test.ctr.helpers.arptoinstrumentpath.configuration.SwitchPath");
+        beanGeneratorSwitchPath.setClass(BeanGenerator.SWITCHPATH);
         beanGeneratorSwitchPath.setPropertyNameForList("switches");
-        //        beanGeneratorSwitchPath.hasRefs();
-        //        beanGeneratorSwitchPath.buildSwitchPath();
         beanGeneratorSwitchPath.build();
         beanGeneratorSwitchPath.getRefsOfSwitchPath().clear();
     }
 
     private void formatBeanGeneratorSwitchPathChild(String referenceId, String switchParent, int position) {
         if (!referenceIdStrings.contains(referenceId)) {
-            beanGeneratorSwitchChild.setBeanId(referenceId);
+            beanGeneratorSwitchChild.setBeanId(beanId + "-" + referenceId);
             beanGeneratorSwitchChild.getProperties().put("position", String.valueOf(position));
-            beanGeneratorSwitchChild.buildParent(referenceId, "parent" + switchParent);
-            //            beanGeneratorSwitchChild.build();
+            beanGeneratorSwitchChild.buildParent(beanId + "-" + "parent" + switchParent);
             referenceIdStrings.add(referenceId);
         }
     }
 
-    private void formatbeanGeneratorSwitchBoxConfigurationSwitchPathsRefList(List<String> switchPaths) {
-        if (!switchPaths.isEmpty())
-            beanGeneratorSwitchBoxConfigurtion.getRefs().add(switchPaths.get(0));
-    }
-
-    private void formatBeanGeneratorSwitchBoxConfigurtion() {
+    private void buildBeanGeneratorSwitchBoxConfigurtion() {
         if (!beanGeneratorSwitchBoxConfigurtion.getBeanString().isEmpty())
             return;
         beanGeneratorSwitchBoxConfigurtion.setBeanId(beanId);
-        beanGeneratorSwitchBoxConfigurtion
-                .setClassName("com.ericsson.radio.test.ctr.helpers.arptoinstrumentpath.configuration.SwitchBoxConfiguration");
+        beanGeneratorSwitchBoxConfigurtion.setClass(BeanGenerator.SWITCHBOXCONFIGURATION);
         beanGeneratorSwitchBoxConfigurtion.setPropertyNameForList("switchPaths");
         beanGeneratorSwitchBoxConfigurtion.getProperties().put("variant", variant);
         beanGeneratorSwitchBoxConfigurtion.getProperties().put("revision", revision);
         beanGeneratorSwitchBoxConfigurtion.getProperties().put("productNumber", productNumber);
         beanGeneratorSwitchBoxConfigurtion.getRefs().addAll(refs);
-        //        beanGeneratorSwitchBoxConfigurtion.buildSwitchBoxConfiguration();
         beanGeneratorSwitchBoxConfigurtion.build();
 
     }
@@ -246,24 +235,6 @@ public class ExcelToBean
             }
         }
         return value;
-    }
-
-    @Test
-    @Parameters({ "sheetName", "startRowIndex", "endRowIndex" })
-    public void testNew(
-            @Optional("BPAU") String sheetName,
-            @Optional("14") int startRowIndex,
-            @Optional("28") int endRowIndex) throws Exception {
-        String beanPath = "C:\\Users\\EKUIWAG\\Desktop\\NGTE\\xml\\";
-        parseExcelCustom(workbook, beanPath, sheetName, startRowIndex, endRowIndex);
-
-    }
-
-    @BeforeTest
-    @Parameters({ "excelDirectory" })
-    public void beforeClass(@Optional("C:\\Users\\EKUIWAG\\Desktop\\NGTE\\NGTE.xls") String excelDirectory)
-            throws FileNotFoundException, IOException {
-        workbook = new HSSFWorkbook(new FileInputStream(excelDirectory));
     }
 
 }

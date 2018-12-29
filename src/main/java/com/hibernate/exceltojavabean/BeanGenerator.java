@@ -14,6 +14,10 @@ public class BeanGenerator {
     private List<String> refs = new ArrayList<>();
     private Map<String, String> properties = new HashMap<>();
     private String propertyNameForList;
+    protected static final String SWITCH = "com.ericsson.radio.test.ctr.helpers.arptoinstrumentpath.configuration.Switch";
+    protected static final String SWITCHPATH = "com.ericsson.radio.test.ctr.helpers.arptoinstrumentpath.configuration.SwitchPath";
+    protected static final String SWITCHBOXCONFIGURATION = "com.ericsson.radio.test.ctr.helpers.arptoinstrumentpath.configuration.SwitchBoxConfiguration";
+//    protected static final String 
 
     /**
      * @return the refsOfSwitchPath
@@ -53,8 +57,12 @@ public class BeanGenerator {
     /**
      * @param className the className to set
      */
-    public void setClassName(String className) {
+    public void setClass(String className) {
         this.className = className;
+    }
+
+    protected void setPropertyNameForList(String name) {
+        propertyNameForList = name;
     }
 
     /**
@@ -82,10 +90,6 @@ public class BeanGenerator {
         return "</beans>";
     }
 
-    protected void setPropertyNameForList(String name) {
-        propertyNameForList = name;
-    }
-
     protected void build() {
         setBeanString(String.format("\t<bean id=\"%s\" class=\"%s\">\n", beanId, className));
         properties.forEach((k, v) -> setBeanString(String.format("\t\t<property name=\"%s\" value=\"%s\" />\n", k, v)));
@@ -99,7 +103,7 @@ public class BeanGenerator {
         setBeanString("\t</bean>\n\n");
     }
 
-    protected void buildParent(String beanId, String parent) {
+    protected void buildParent(String parent) {
         setBeanString(String.format("\t<bean id=\"%s\" parent=\"%s\">\n", beanId, parent));
         properties.forEach((k, v) -> setBeanString(String.format("\t\t<property name=\"%s\" value=\"%s\" />\n", k, v)));
         setBeanString("\t</bean>\n\n");
