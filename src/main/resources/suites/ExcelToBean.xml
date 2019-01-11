@@ -145,14 +145,14 @@
             <parameter name="endRowIndex" value="102" />
         </classes>
     </test>
-<!--     <test name="TMU01"> -->
-<!--         <classes> -->
-<!--             <class name="com.hibernate.exceltojavabean.ExcelToBean" /> -->
-<!--             <parameter name="sheetName" value="TMU" /> -->
-<!--             <parameter name="startRowIndex" value="14" /> -->
-<!--             <parameter name="endRowIndex" value="57" /> -->
-<!--         </classes> -->
-<!--     </test> -->
+    <test name="TMU01">
+        <classes>
+            <class name="com.hibernate.exceltojavabean.ExcelToBean" />
+            <parameter name="sheetName" value="TMU" />
+            <parameter name="startRowIndex" value="14" />
+            <parameter name="endRowIndex" value="57" />
+        </classes>
+    </test>
     <test name="TMU02">
         <classes>
             <class name="com.hibernate.exceltojavabean.ExcelToBean" />
@@ -199,6 +199,14 @@
             <parameter name="sheetName" value="ECU" />
             <parameter name="startRowIndex" value="29" />
             <parameter name="endRowIndex" value="37" />
+        </classes>
+    </test>
+        <test name="SWITCH01">
+        <classes>
+            <class name="com.hibernate.exceltojavabean.ExcelToBean" />
+            <parameter name="sheetName" value="SWITCH" />
+            <parameter name="startRowIndex" value="14" />
+            <parameter name="endRowIndex" value="21" />
         </classes>
     </test>
 </suite>
