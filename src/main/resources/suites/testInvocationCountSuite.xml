@@ -1,8 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <suite name="Suite"  preserve-order="true" parallel="false" >
+    <listeners>
+        <listener class-name="com.mymaven.testng.EnvListener" />
+    </listeners>
+    <parameter name="sustaintime" value="30" />
   <test name="Test1"   preserve-order="true" parallel="false">
     <classes>
-      <class name="com.mymaven.testng.testInvocationCount">
+      <class name="com.mymaven.testng.TestInvocationCount">
         <methods>
             <include name="testMethod1" />
         </methods>
@@ -11,7 +15,7 @@
   </test> 
     <test name="Test2">
     <classes>
-      <class name="com.mymaven.testng.testInvocationCount">
+      <class name="com.mymaven.testng.TestInvocationCount">
         <methods>
             <include name="testMethod3" />
         </methods>
@@ -20,7 +24,7 @@
   </test>
     <test name="Test3">
     <classes>
-      <class name="com.mymaven.testng.testInvocationCount">
+      <class name="com.mymaven.testng.TestInvocationCount">
         <methods>
             <include name="testMethod2" />
         </methods>
