@@ -2,6 +2,7 @@ package com.hibernate.exceltojavabean;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -12,7 +13,7 @@ public class BeanGenerator {
     private String beanId;
     private String className;
     private List<String> refs = new ArrayList<>();
-    private Map<String, String> properties = new HashMap<>();
+    private Map<String, String> properties = new LinkedHashMap<>();
     private String propertyNameForList;
     protected static final String SWITCH = "com.ericsson.radio.test.ctr.helpers.arptoinstrumentpath.configuration.Switch";
     protected static final String SWITCHPATH = "com.ericsson.radio.test.ctr.helpers.arptoinstrumentpath.configuration.SwitchPath";
@@ -65,6 +66,16 @@ public class BeanGenerator {
         propertyNameForList = name;
     }
 
+    
+    /**
+     * Set property.
+     * @param key map key
+     * @param value map value
+     */
+    public void setProperty(String key, String value) {
+        properties.put(key, value);
+    }
+    
     /**
      * @return the properties
      */

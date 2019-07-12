@@ -201,12 +201,20 @@
             <parameter name="endRowIndex" value="37" />
         </classes>
     </test>
-        <test name="SWITCH01">
+    <test name="SWITCH01">
         <classes>
             <class name="com.hibernate.exceltojavabean.ExcelToBean" />
             <parameter name="sheetName" value="SWITCH" />
             <parameter name="startRowIndex" value="14" />
             <parameter name="endRowIndex" value="21" />
+        </classes>
+    </test>
+    <test name="TRIU_2239_1">
+        <classes>
+            <class name="com.hibernate.exceltojavabean.ExcelToBean" />
+            <parameter name="sheetName" value="TRIU_2239_1" />
+            <parameter name="startRowIndex" value="19" />
+            <parameter name="endRowIndex" value="57" />
         </classes>
     </test>
 </suite>

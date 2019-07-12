@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<suite name="Suite" parallel="false">
+    <parameter name="excelDirectory" value="C:\Users\EKUIWAG\Desktop\NGTE\Limits.xls" />
+    <test name="testGenrateBean">
+        <classes>
+            <class name="com.hibernate.exceltojavabean.ExcelToBeanForEIRP" />
+            <parameter name="sheetName" value="9.2.1.2 Target EIRP, AIR 6468" />
+            <parameter name="startRowIndex" value="2" />
+            <parameter name="endRowIndex" value="19" />
+            <methods>
+                <include name="testGenrateBean" />
+            </methods>
+        </classes>
+    </test>
+</suite>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<suite name="Suite"  preserve-order="true" parallel="false" >
+  <test name="Test1"   preserve-order="true" parallel="false">
+    <classes>
+      <class name="com.mymaven.testng.testInvocationCount">
+        <methods>
+            <include name="testMethod1" />
+        </methods>
+        </class>
+    </classes>
+  </test> 
+    <test name="Test2">
+    <classes>
+      <class name="com.mymaven.testng.testInvocationCount">
+        <methods>
+            <include name="testMethod3" />
+        </methods>
+                </class>
+    </classes>
+  </test>
+    <test name="Test3">
+    <classes>
+      <class name="com.mymaven.testng.testInvocationCount">
+        <methods>
+            <include name="testMethod2" />
+        </methods>
+                </class>
+    </classes>
+  </test> <!-- Test -->
+</suite> <!-- Suite -->
